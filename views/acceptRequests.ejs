@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List of Requests</title>
+</head>
+<body>
+    <h1>List of Requests</h1>
+    <form action="/admin/requests" method="POST">
+        <ul>
+            <% requests.forEach(function(request) { %>
+                <li>
+                    <strong>Book ID:</strong> <%= request.BookID %><br>
+                    <strong>Book Name:</strong> <%= request.Title %><br>
+                    <strong>User ID:</strong> <%= request.UserID %><br>
+                    <strong>User Name:</strong> <%= request.Username %><br>
+                    <strong>Date:</strong> <%= request.RequestDate %><br>
+                    <input type="checkbox" name="selectedRequests" value="<%= request.RequestID %>"> 
+            <% }); %>
+        </ul>
+        <button type="submit">Accept Requests</button>
+    </form>
+</body>
+</html>

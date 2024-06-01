@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List of Books</title>
+</head>
+<body>
+  <h1>Request Books</h1>
+  <form action="/home/request" method="POST">
+    <ul>
+      <% books.forEach(function(book) { %>
+        <li>
+          <input type="checkbox" name="selectedBooks" value="<%= book.BookID %>">
+          <span><%= book.Title %></span>
+          <input type="hidden" name="BookID" value="<%= book.BookID %>">
+        </li>
+      <% }); %>
+    </ul>
+    <button type="submit">Request Books</button>
+  </form>
+</body>
+</html>
