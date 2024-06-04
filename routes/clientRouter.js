@@ -1,12 +1,11 @@
 const express = require("express");
-const pool = require("../database")
+
 const bcrypt = require("bcryptjs")
 const { v4: uuidv4 } = require("uuid");
 const { hashPassword, setUser, getUser, isAdmin } = require('../service/auth')
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const secret = "hello"
-
 
 const mysql = require('mysql2')
 const pool = mysql.createPool({
@@ -15,6 +14,7 @@ const pool = mysql.createPool({
   password: process.env.DB_PASS,
   database: process.env.DB,
 }).promise()
+
 
 router.get("/", (req, res) => {
   return res.render("signup")
