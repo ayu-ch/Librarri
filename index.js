@@ -2,7 +2,8 @@
 const express = require('express');
 const app = express()
 const path = require('path')
-const staticRoute = require("./routes/staticRouter")
+const clientRouter = require("./routes/clientRouter")
+const adminRouter = require("./routes/adminRouter")
 const cookieParser = require("cookie-parser");
 const {access} = require("./service/auth") 
 
@@ -22,7 +23,8 @@ app.get("/api",(req,res)=>{
 app.set("view engine", "ejs");
 app.set("views", path.resolve("./views"))
 
-app.use("/",access,staticRoute)
+app.use("/",access,clientRouter)
+app.use("/",access,adminRouter)
 
 
 

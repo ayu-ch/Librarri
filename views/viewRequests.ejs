@@ -17,9 +17,13 @@
     <h1>List of Books</h1>
     <ul>
         <% books.forEach(function(book) { %>
-            <li>Title: <%= book.Title %>, Author: <%= book.Author %>, Genre: <%= book.Genre %>, 
+            <li>
+              <strong>Title</strong>:</strong> <%= book.Title %><br>
+              <strong>Author:</strong> <%= book.Author %><br>
+              <strong>Genre</strong> <%= book.Genre %><br> 
+              
               <span class="<%=book.Status === 'Pending' ? 'pending' : 'accepted' %>">
-                Status: <%=book.Status%>
+                <strong> Status: </strong><%=book.Status%>
               </span></li>
         <% }); %>
     </ul>

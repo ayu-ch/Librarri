@@ -9,7 +9,10 @@
     <h1>List of Books</h1>
     <ul>
         <% books.forEach(function(book) { %>
-            <li>Title: <%= book.Title %>, Author: <%= book.Author %>, Genre: <%= book.Genre %></li>
+            <li>
+                <strong>Title</strong>:</strong> <%= book.Title %><br>
+                <strong>Author:</strong> <%= book.Author %><br>
+                <strong>Genre</strong> <%= book.Genre %><br>
         <% }); %>
     </ul>
 </body>

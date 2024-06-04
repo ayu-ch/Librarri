@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List of Books</title>
+</head>
+<body>
+    <h1>Borrowing History</h1>
+    <ul>
+      <% history.forEach(function(book) { %>
+        <li>
+            <strong>Book ID:</strong> <%= book.BookID %><br>
+            <strong>Book Name:</strong> <%= book.BookTitle %><br>
+            <strong>Request ID:</strong> <%= book.RequestID %><br>
+            <strong>Accepted Date:</strong> <%= book.AcceptDate %><br>
+    <% }); %>
+    </ul>
+    
+</body>
+</html>

@@ -33,3 +33,20 @@ CREATE TABLE BookRequests (
     FOREIGN KEY (UserID) REFERENCES User(UserID),
     FOREIGN KEY (BookID) REFERENCES Books(BookID)
 );
+
+CREATE TABLE AdminRequest (
+    RequestID INT AUTO_INCREMENT PRIMARY KEY,
+    UserID INT,
+    Username VARCHAR(255) NOT NULL,
+    FOREIGN KEY (UserID) REFERENCES User(UserID),
+    FOREIGN KEY (Username) REFERENCES User(Username)
+);
+
+CREATE TABLE BorrowHistory(
+    RequestID INT,
+    UserID INT,
+    AcceptDate TIMESTAMP NOT NULL DEFAULT NOW(),
+    BookID INT,
+    FOREIGN KEY (UserID) REFERENCES User(UserID),
+    FOREIGN KEY (BookID) REFERENCES Books(BookID)
+);
