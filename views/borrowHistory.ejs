@@ -20,11 +20,11 @@
       <form action="/home/return" method="POST">
       <ul class="text-center">
       <% history.forEach(function(book) { %>
-        <li>
-            <strong>Book ID:</strong> <%= history.BookID %><br>
-            <strong>Book Name:</strong> <%= history.BookTitle %><br>
-            <strong>Request ID:</strong> <%= history.RequestID %><br>
-            <strong>Accepted Date:</strong> <%= history.AcceptDate %><br>
+        <li class="mb-9">
+          <strong class="text-xl text-[#1d3557] font-extrabold ">Book ID:</strong><span class="text-xl text-[#457B9D] font-bold"> <%= book.BookID %></span><br>
+          <strong class="text-xl text-[#1d3557] font-extrabold ">Book Name:</strong><span class="text-xl text-[#457B9D] font-bold"> <%= book.Title %></span><br>
+          <strong class="text-xl text-[#1d3557] font-extrabold ">Request ID:</strong><span class="text-xl text-[#457B9D] font-bold"> <%= book.RequestID %></span><br>
+          <strong class="text-xl text-[#1d3557] font-extrabold "> Accepted Date:</strong><span class="text-xl text-[#457B9D] font-bold"> <%= book.AcceptDate %></span><br>
     <% }); %>
     </ul>
     

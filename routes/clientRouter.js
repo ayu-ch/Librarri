@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require("uuid");
 const { hashPassword, setUser, getUser, isAdmin } = require('../service/auth')
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const secret = "hello0"
+const secret = "secret"
 
 const mysql = require('mysql2')
 const pool = mysql.createPool({
@@ -237,7 +237,7 @@ router.post("/home/return", async (req, res) => {
   try {
     for (const requestID of selectedRequests) {
 
-      await pool.query('DELETE FROM BookRequests WHERE RequestID = ?', [requestID]);
+      await pool.query('UPDATE BookRequests SET Status = "Returned" WHERE RequestID = ?', [requestID]);
     }
 
 
@@ -256,7 +256,7 @@ router.post("/home/requestAdmin", async (req, res) => {
   const [user] = await pool.query('SELECT UserID FROM User WHERE Username = ?', [name]);
   const UserID = user[0].UserID;
   try {
-    await pool.query("INSERT INTO AdminRequest (UserID, Username, Role) VALUES (?, ?, ?)", [UserID, name, role]);
+    await pool.query("UPDATE User SET AdminRequest = 'Pending' WHERE UserID =?",[UserID])
     res.send("Request Sent!");
   } catch (error) {
     console.log(error);
@@ -271,8 +271,8 @@ router.get("/home/borrowHistory",async(req,res)=>{
     const name = decoded.username;
     const [user] = await pool.query('SELECT UserID FROM User WHERE Username = ?', [name]);
     const UserID = user[0].UserID;
-    try {
-      const [rows, fields] =  await pool.query("SELECT BH.AcceptDate, BH.RequestID, BH.BookID, B.Title AS BookTitle FROM BorrowHistory BH JOIN Books B ON BH.BookID = B.BookID WHERE BH.UserID = ?", [UserID])
+      try {
+        const [rows, fields] =  await pool.query("SELECT br.AcceptDate, br.RequestID, br.BookID, b.Title FROM BookRequests br INNER JOIN Books b ON br.BookID = b.BookID WHERE br.UserID = ? AND (br.Status = 'Accepted' OR br.Status = 'Returned')", [UserID])
       return rows;
     } catch (error) {
       throw error;
@@ -280,6 +280,7 @@ router.get("/home/borrowHistory",async(req,res)=>{
   } 
   try {
     const history = await getHistory();
+    console.log(history)
     res.render('borrowHistory.ejs', { history: history });
   }catch(err){
     console.log(err)
