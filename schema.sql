@@ -22,7 +22,7 @@ CREATE TABLE BookRequests (
     UserID INT,
     BookID INT,
     RequestDate TIMESTAMP NOT NULL DEFAULT NOW(),
-    AcceptDate TIMESTAMPT DEFAULT NULL,
+    AcceptDate TIMESTAMP DEFAULT NULL,
     Status ENUM('Pending','Accepted','Returned') DEFAULT 'Pending',
     FOREIGN KEY (UserID) REFERENCES User(UserID),
     FOREIGN KEY (BookID) REFERENCES Books(BookID)
