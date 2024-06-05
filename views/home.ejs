@@ -4,42 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-        h1 {
-            text-align: center;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            padding: 10px 0;
-        }
-        a {
-            text-decoration: none;
-            color: #333;
-        }
-        a:hover {
-            color: #007bff;
-        }
+      *{
+        font-family: 'Poppins', sans-serif;
+      }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>HomePage</h1>
+<body class="bg-[#a8dadc]">
+    <div class="bg-[#f1faee] max-w-7xl p-6 mx-auto rounded-lg my-12">
+        <h1 class="text-5xl text-center font-extrabold text-[#e63946]">Librarri</h1>
+        <h2 class="mt-6 text-2xl text-center font-extrabold text-[#1d3557] pb-10">A library management system</h2>
+        <div class="w-full border-b border-zinc-400 mb-6"></div> 
+        <ul class="text-center py-10">
+          <li class="mb-12 text-4xl font-extrabold text-[#457B9D] "><a href="/home/request">Request a Book</a></li>
+          <li class="my-12 text-4xl font-extrabold text-[#457B9D]"><a href="/home/requests">View your books</a></li>
+          <li class="my-12 text-4xl font-extrabold text-[#457B9D]"><a href="/home/return">Return Books</a></li>
+          <li class="my-12 text-4xl font-extrabold text-[#457B9D]"><a href="/home/borrowHistory">Borrowing  History</a></li>
+          <li>
+            <form action="/home/requestAdmin" method="post">
+              <div class="max-w-sm mx-auto">
+                <button class="w-full bg-[#a8dadc] text-gray-700 rounded-md p-2 font-extrabold text-xl text-[#1D3557] " type="Submit">Request Admin privileges</button>
+              </div>
+            </form>
+          </li>
+      </ul> 
+    </div>
+        <!-- 
         <ul>
             <li><a href="/home/request">Add a Request</a></li>
             <li><a href="/home/requests">View your books</a></li>
@@ -50,7 +44,7 @@
                 <button type="Submit">Request Admin privileges</button>
               </form>
             </li>
-        </ul>
-    </div>
+        </ul> -->
+    
 </body>
 </html>

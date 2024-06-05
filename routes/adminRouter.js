@@ -39,6 +39,7 @@ router.get("/admin/books/list", isAdmin, async (req, res) => {
   }
   try {
     const books = await getBooks();
+    console.log(books)
     res.render('listBook', { books: books });
   } catch (err) {
     console.log(err);
@@ -117,9 +118,9 @@ router.post("/admin/requests", isAdmin, async (req, res) => {
     try {
       for (const requestID of selectedRequests) {
 
-        await pool.query('UPDATE BookRequests SET Status = "Accepted" WHERE RequestID =?', parseInt([requestID]));
-        const requestData = await pool.query('SELECT UserID, BookID, FROM BookRequests WHERE RequestID = ?', [requestID]);
-        const { UserID, BookID } = requestData[0];
+        await pool.query('UPDATE BookRequests SET Status = "Accepted" WHERE RequestID =?', requestID);
+        const requestData = await pool.query('SELECT UserID, BookID FROM BookRequests WHERE RequestID = ?', [requestID]);
+        const [{ UserID, BookID }] = requestData[0];
         await pool.query('INSERT INTO BorrowHistory (RequestID, UserID, BookID) VALUES (?, ?, ?)', [requestID, UserID, BookID]);
 
       }
@@ -132,8 +133,8 @@ router.post("/admin/requests", isAdmin, async (req, res) => {
   else {
     try {
       await pool.query('UPDATE BookRequests SET Status = "Accepted" WHERE RequestID =?', [selectedRequests]);
-      const requestData = await pool.query('SELECT UserID, BookID, FROM BookRequests WHERE RequestID = ?', [selectedRequests]);
-      const { UserID, BookID } = requestData[0];
+      const requestData = await pool.query('SELECT UserID, BookID FROM BookRequests WHERE RequestID = ?', [selectedRequests]);
+      const [{ UserID, BookID }] = requestData[0];
       await pool.query('INSERT INTO BorrowHistory (RequestID, UserID, BookID) VALUES (?, ?, ?)', [selectedRequests, UserID, BookID]);
       res.redirect('/admin/requests');
     } catch (error) {
@@ -171,8 +172,8 @@ router.post("/admin/users", isAdmin, async (req, res) => {
     try {
       for (const UserID of selectedUsers) {
 
-        await pool.query('UPDATE User SET Status = "Admin" WHERE RequestID =?', [UserID]);
-        await pool.query("DELETE * FROM AdminRequest WHERE UserID = ?",[UserID])
+        await pool.query('UPDATE User SET Role = "Admin" WHERE UserID =?', parseInt([UserID]));
+        await pool.query("DELETE FROM AdminRequest WHERE UserID = ?", parseInt([UserID]))
       }
 
       res.redirect('/admin/users');
@@ -183,7 +184,8 @@ router.post("/admin/users", isAdmin, async (req, res) => {
   }
   else {
     try {
-      await pool.query('UPDATE User SET Role = "Admin" WHERE UserID =?', [selectedUsers]);
+      await pool.query('UPDATE User SET Role = "Admin" WHERE UserID =?',  parseInt([selectedUsers]));
+      await pool.query("DELETE FROM AdminRequest WHERE UserID = ?",parseInt([selectedUsers]));
       res.redirect('/admin/users');
     } catch (error) {
       console.error(error);

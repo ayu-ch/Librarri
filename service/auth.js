@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require('jsonwebtoken');
-const secret = "hello"
+const secret = "secret"
 
 hashPassword= async function(password) {
     const saltRounds = 5;
@@ -11,8 +11,6 @@ hashPassword= async function(password) {
         hash: hash
     };
 }
-
-
 
 function setUser(user){
   return jwt.sign({

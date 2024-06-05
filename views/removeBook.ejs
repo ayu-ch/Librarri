@@ -3,20 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>List of Books</title>
+    <title>Admin Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <style>
+      *{
+        font-family: 'Poppins', sans-serif;
+      }
+    </style>
 </head>
-<body>
-  <h1>List of Books</h1>
-  <form action="/admin/books/remove" method="POST">
-    <ul>
-      <% books.forEach(function(book) { %>
-        <li>
-          <input type="checkbox" name="selectedBooks" value="<%= book.BookID %>">
-          <span><%= book.Title %></span>
-        </li>
-      <% }); %>
-    </ul>
-    <button type="submit">Delete Selected</button>
+<body class="bg-[#a8dadc]">
+    <div class="bg-[#f1faee] max-w-7xl p-6 mx-auto rounded-lg my-12">
+      <h1 class="text-5xl text-center font-extrabold text-[#e63946] mb-12">BookList</h1>
+      <form action="/admin/books/remove" method="POST">
+      <ul class="text-center">
+          <% books.forEach(function(book) { %>
+            <li>
+              <div class="mb-6">
+                <input type="checkbox" name="selectedBooks" value="<%= book.BookID %>">
+                <span class="text-2xl font-bold text-[#457B9D] "><%= book.Title %> by <%=book.Author%> (<%=book.Genre%>)</span>
+                <input type="hidden" name="BookID" value="<%= book.BookID %>">
+              </div>
+            </li>
+          <% }); %>
+      </ul>
+      <div class="max-w-sm mx-auto">
+        <button class="w-full bg-[#a8dadc] text-gray-700 rounded-md p-2 font-extrabold text-xl text-[#1D3557]" type="submit">Remove Selected</button>
+      </div>
   </form>
 </body>
 </html>

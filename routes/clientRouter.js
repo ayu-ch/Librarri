@@ -1,11 +1,11 @@
 const express = require("express");
-
+// const pool = require("../database")
 const bcrypt = require("bcryptjs")
 const { v4: uuidv4 } = require("uuid");
 const { hashPassword, setUser, getUser, isAdmin } = require('../service/auth')
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const secret = "hello"
+const secret = "hello0"
 
 const mysql = require('mysql2')
 const pool = mysql.createPool({
@@ -14,7 +14,6 @@ const pool = mysql.createPool({
   password: process.env.DB_PASS,
   database: process.env.DB,
 }).promise()
-
 
 router.get("/", (req, res) => {
   return res.render("signup")
@@ -183,26 +182,29 @@ router.get("/home/requests", async (req, res) => {
   }
   try {
     const requests = await getRequests();
+
     if (requests.length > 0) {
       const BookIDs = requests.map(request => request.BookID);
       console.log(BookIDs);
+      token = req.cookies.uid;
+      const decoded = jwt.verify(token, secret);
+      const name = decoded.username;
+      const [user] = await pool.query('SELECT UserID FROM User WHERE Username = ?', [name]);
+      const UserID = user[0].UserID;
       const [books, fields] = await pool.query(`
-                SELECT b.*, br.Status
-                FROM Books b
-                JOIN BookRequests br ON b.BookID = br.BookID
-                WHERE b.BookID IN (${BookIDs.join(',')})
-            `);
+          SELECT b.*, br.Status
+          FROM Books b
+          JOIN BookRequests br ON b.BookID = br.BookID
+          WHERE b.BookID IN (?)
+          AND br.UserID = ?
+      `, [BookIDs, UserID]);
       console.log(books)
       res.render('viewRequests', { books: books });
     }
   } catch (error) {
     console.error(error);
   }
-
 })
-
-
-
 
 router.get("/home/return", async (req, res) => {
   async function getRequests() {
@@ -211,6 +213,7 @@ router.get("/home/return", async (req, res) => {
     const name = decoded.username;
     const [user] = await pool.query('SELECT UserID FROM User WHERE Username = ?', [name]);
     const UserID = user[0].UserID;
+
     try {
       const [rows, fields] = await pool.query("SELECT BookRequests.BookID, BookRequests.UserID,BookRequests.RequestID, BookRequests.RequestDate, User.Username, Books.Title FROM BookRequests JOIN User ON BookRequests.UserID = User.UserID JOIN Books ON BookRequests.BookID = Books.BookID WHERE BookRequests.Status = 'Accepted' AND BookRequests.UserID = ? ", [UserID]);
       return rows;
@@ -249,10 +252,11 @@ router.post("/home/requestAdmin", async (req, res) => {
   token = req.cookies.uid;
   const decoded = jwt.verify(token, secret);
   const name = decoded.username;
+  const role = decoded.role;
   const [user] = await pool.query('SELECT UserID FROM User WHERE Username = ?', [name]);
   const UserID = user[0].UserID;
   try {
-    await pool.query("INSERT INTO AdminRequest (UserID, Username) VALUES (?, ?)", [UserID, name]);
+    await pool.query("INSERT INTO AdminRequest (UserID, Username, Role) VALUES (?, ?, ?)", [UserID, name, role]);
     res.send("Request Sent!");
   } catch (error) {
     console.log(error);
