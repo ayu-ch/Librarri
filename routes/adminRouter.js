@@ -119,7 +119,7 @@ router.post("/admin/requests", isAdmin, async (req, res) => {
       for (const requestID of selectedRequests) {
 
         await pool.query('UPDATE BookRequests SET Status = "Accepted" WHERE RequestID =?', requestID);
-        await pool.query('UPDATE BookRequests SET AcceptDate = NOW() WHERE RequestID = ?',[selectedRequests])
+        await pool.query('UPDATE BookRequests SET AcceptDate = NOW() WHERE RequestID = ?',[requestID])
 
       }
       res.redirect('/admin/requests');

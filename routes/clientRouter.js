@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require("uuid");
 const { hashPassword, setUser, getUser, isAdmin } = require('../service/auth')
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const secret = "secret"
+const secret = "hello"
 
 const mysql = require('mysql2')
 const pool = mysql.createPool({
@@ -234,17 +234,24 @@ router.get("/home/return", async (req, res) => {
 
 router.post("/home/return", async (req, res) => {
   const selectedRequests = req.body.selectedRequests;
-  try {
+  if (Array.isArray(selectedRequests)) {
+    try{
     for (const requestID of selectedRequests) {
-
       await pool.query('UPDATE BookRequests SET Status = "Returned" WHERE RequestID = ?', [requestID]);
     }
-
-
     res.redirect('/home/requests');
-  } catch (error) {
+  }catch (error) {
     console.error(error);
-    res.status(500).send('Error deleting books from database');
+    res.status(500).send('Error returning books');
+  }
+  } 
+  else{
+    try{
+      await pool.query('UPDATE BookRequests SET Status = "Returned" WHERE RequestID = ?', [selectedRequests]);
+    }catch(error) {
+      console.error(error);
+      res.status(500).send('Error returning books');
+    }
   }
 })
 
@@ -288,8 +295,12 @@ router.get("/home/borrowHistory",async(req,res)=>{
   }
 })
 
-
-
-
+router.get("/logout",async(req,res)=>{
+  const cookies = req.cookies;
+  for( cookie in cookies){
+    res.clearCookie(cookie);
+  }
+  res.redirect("/login");
+})
 
 module.exports = router;
