@@ -20,6 +20,19 @@ app.get("/api",(req,res)=>{
   });
 });
 
+app.use((err, req, res, next) => {
+   
+  let statusCode = err.status || 500;
+  let message = err.message || 'Internal Server Error';
+
+  if (statusCode === 404) {
+      message = 'Page Not Found';
+  }
+
+
+  res.status(statusCode).render('error', { statusCode, message });
+});
+
 app.set("view engine", "ejs");
 app.set("views", path.resolve("./views"))
 

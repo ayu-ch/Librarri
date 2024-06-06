@@ -15,6 +15,7 @@ const pool = mysql.createPool({
   database: process.env.DB,
 }).promise()
 
+
 router.get("/", (req, res) => {
   return res.render("signup")
 })
@@ -72,11 +73,17 @@ router.post('/login', async (req, res) => {
 });
 
 router.get("/home", (req, res) => {
-  return res.render("home")
+  token = req.cookies.uid;
+  const decoded = jwt.verify(token, secret);
+  const name = decoded.username;
+  return res.render("home",{name:name})
 })
 
 router.get("/admin", isAdmin, (req, res) => {
-  return res.render("adminPortal");
+  token = req.cookies.uid;
+  const decoded = jwt.verify(token, secret);
+  const name = decoded.username;
+  return res.render("adminPortal",{name:name}) 
 })
 
 
@@ -121,7 +128,7 @@ router.post('/admin/login', async (req, res) => {
 router.get("/home/request", async (req, res) => {
   async function getBooks() {
     try {
-      const [rows, fields] = await pool.query('SELECT * FROM Books');
+      const [rows, fields] = await pool.query('SELECT * FROM Books WHERE Quantity>0');
       return rows;
     } catch (error) {
       throw error;
@@ -145,23 +152,49 @@ router.post("/home/request", async (req, res) => {
   const [user] = await pool.query('SELECT UserID FROM User WHERE Username = ?', [name]);
   const UserID = user[0].UserID;
   console.log(UserID);
+  if (Array.isArray(selectedBooks)) {
+    try {
+      for (const BookID of selectedBooks) {
+        const [existingRequest] = await pool.query('SELECT * FROM BookRequests WHERE UserID = ? AND BookID = ? AND Status IN ("Accepted", "Pending")', [UserID, BookID]);
+        if (!(existingRequest.length) == 0) {
+          return res.status(400).json({ error: "You already have or requested this book" });
+        }
+        try {
+          const sql = "INSERT INTO BookRequests (UserID, BookID) VALUES (?, ?)";
+          await pool.query(sql, [UserID, parseInt(BookID)]);
+          console.log("Book added to database");
+        } catch (error) {
+          console.error(error);
+          return res.status(500).send("Error inserting user into database");
+        }
+      }
 
-  try {
-    for (const BookID of selectedBooks) {
+      res.redirect("/home/requests");
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('BookID Error');
+    }
+  }
+  else {
+    try {
+      const [existingRequest] = await pool.query('SELECT * FROM BookRequests WHERE UserID = ? AND BookID = ? AND Status IN ("Accepted", "Pending")', [UserID, selectedBooks]);
+      if (!(existingRequest.length) == 0) {
+        return res.status(400).json({ error: "You already have or requested this book" });
+      }
       try {
         const sql = "INSERT INTO BookRequests (UserID, BookID) VALUES (?, ?)";
-        await pool.query(sql, [UserID, BookID]);
+        await pool.query(sql, [UserID, selectedBooks]);
         console.log("Book added to database");
       } catch (error) {
         console.error(error);
         return res.status(500).send("Error inserting user into database");
       }
+      res.redirect("/home/requests")
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('BookID Error');
     }
 
-    res.redirect("/home/requests");
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('BookID Error');
   }
 })
 
@@ -206,6 +239,45 @@ router.get("/home/requests", async (req, res) => {
   }
 })
 
+
+// router.get("/home/books", async (req, res) => {
+//   token = req.cookies.uid;
+//   const decoded = jwt.verify(token, secret);
+//   const name = decoded.username;
+//   const [user] = await pool.query('SELECT UserID FROM User WHERE Username = ?', [name]);
+//   const UserID = user[0].UserID;
+//   async function getRequests() {
+//     try {
+//       const [rows, fields] = await pool.query('SELECT * FROM BookRequests WHERE UserID = ? AND Status = "Accepted"', [UserID]);
+//       return rows;
+//     } catch (error) {
+//       throw error;
+//     }
+//   }
+//   try {
+//     const requests = await getRequests();
+//     if (requests.length > 0) {
+//       const BookIDs = requests.map(request => request.BookID);
+//       console.log(BookIDs);
+//       token = req.cookies.uid;
+//       const decoded = jwt.verify(token, secret);
+//       const name = decoded.username;
+//       const [user] = await pool.query('SELECT UserID FROM User WHERE Username = ?', [name]);
+//       const UserID = user[0].UserID;
+//       const [books, fields] = await pool.query(`
+//           SELECT b.*, br.Status
+//           FROM Books b
+//           JOIN BookRequests br ON b.BookID = br.BookID
+//           WHERE b.BookID IN (?)
+//           AND br.UserID = ?
+//       `, [BookIDs, UserID]);
+//       res.render('viewRequests', { books: books });
+//     }
+//   } catch (error) {
+//     console.error(error);
+//   }
+// })
+
 router.get("/home/return", async (req, res) => {
   async function getRequests() {
     token = req.cookies.uid;
@@ -223,7 +295,6 @@ router.get("/home/return", async (req, res) => {
   }
   try {
     const requests = await getRequests();
-    console.log(requests)
     res.render('returnBooks.ejs', { requests: requests });
   } catch (err) {
     console.log(err);
@@ -235,20 +306,28 @@ router.get("/home/return", async (req, res) => {
 router.post("/home/return", async (req, res) => {
   const selectedRequests = req.body.selectedRequests;
   if (Array.isArray(selectedRequests)) {
-    try{
-    for (const requestID of selectedRequests) {
-      await pool.query('UPDATE BookRequests SET Status = "Returned" WHERE RequestID = ?', [requestID]);
+    try {
+      for (const requestID of selectedRequests) {
+        await pool.query('UPDATE BookRequests SET Status = "Returned" WHERE RequestID = ?', [requestID]);
+        const [bookIDS] = await pool.query("SELECT BookID FROM BookRequests WHERE RequestID = ?", [requestID])
+        const BookID = bookIDS[0].BookID;
+        await pool.query("UPDATE Books  SET Quantity = Quantity + 1 WHERE BookID=?", [BookID])
+      }
+      res.redirect('/home/requests');
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error returning books');
     }
-    res.redirect('/home/requests');
-  }catch (error) {
-    console.error(error);
-    res.status(500).send('Error returning books');
   }
-  } 
-  else{
-    try{
+  else {
+    try {
       await pool.query('UPDATE BookRequests SET Status = "Returned" WHERE RequestID = ?', [selectedRequests]);
-    }catch(error) {
+      const [bookIDS] = await pool.query("SELECT BookID FROM BookRequests WHERE RequestID = ?", [selectedRequests])
+      const BookID = bookIDS[0].BookID;
+      await pool.query("UPDATE Books  SET Quantity = Quantity + 1 WHERE BookID=?", [BookID])
+      res.redirect('/home/requests');
+
+    } catch (error) {
       console.error(error);
       res.status(500).send('Error returning books');
     }
@@ -263,7 +342,7 @@ router.post("/home/requestAdmin", async (req, res) => {
   const [user] = await pool.query('SELECT UserID FROM User WHERE Username = ?', [name]);
   const UserID = user[0].UserID;
   try {
-    await pool.query("UPDATE User SET AdminRequest = 'Pending' WHERE UserID =?",[UserID])
+    await pool.query("UPDATE User SET AdminRequest = 'Pending' WHERE UserID =?", [UserID])
     res.send("Request Sent!");
   } catch (error) {
     console.log(error);
@@ -271,33 +350,33 @@ router.post("/home/requestAdmin", async (req, res) => {
   }
 })
 
-router.get("/home/borrowHistory",async(req,res)=>{
-  async function getHistory(){
+router.get("/home/borrowHistory", async (req, res) => {
+  async function getHistory() {
     token = req.cookies.uid;
     const decoded = jwt.verify(token, secret);
     const name = decoded.username;
     const [user] = await pool.query('SELECT UserID FROM User WHERE Username = ?', [name]);
     const UserID = user[0].UserID;
-      try {
-        const [rows, fields] =  await pool.query("SELECT br.AcceptDate, br.RequestID, br.BookID, b.Title FROM BookRequests br INNER JOIN Books b ON br.BookID = b.BookID WHERE br.UserID = ? AND (br.Status = 'Accepted' OR br.Status = 'Returned')", [UserID])
+    try {
+      const [rows, fields] = await pool.query("SELECT br.AcceptDate, br.RequestID, br.BookID, b.Title FROM BookRequests br INNER JOIN Books b ON br.BookID = b.BookID WHERE br.UserID = ? AND (br.Status = 'Accepted' OR br.Status = 'Returned')", [UserID])
       return rows;
     } catch (error) {
       throw error;
     }
-  } 
+  }
   try {
     const history = await getHistory();
     console.log(history)
     res.render('borrowHistory.ejs', { history: history });
-  }catch(err){
+  } catch (err) {
     console.log(err)
     res.status(500).send("Error in viewing borrowing history");
   }
 })
 
-router.get("/logout",async(req,res)=>{
+router.get("/logout", async (req, res) => {
   const cookies = req.cookies;
-  for( cookie in cookies){
+  for (cookie in cookies) {
     res.clearCookie(cookie);
   }
   res.redirect("/login");

@@ -16,15 +16,27 @@ router.get("/admin/books/add", isAdmin, (req, res) => {
 })
 
 router.post("/admin/books/add", isAdmin, async (req, res) => {
-  const { title, author, genre } = req.body;
-  try {
-    const sql = "INSERT INTO Books (Title, Author, Genre) VALUES (?, ?, ?)";
-    await pool.query(sql, [title, author, genre]);
-    console.log("Book added to database");
+  async function bookExists(title, author) {
+    const [rows, fields] = await pool.query('SELECT * FROM Books WHERE Title = ? AND Author = ? ', [title, author]);
+    return rows.length > 0;
+  }
+  const { title, author, genre, quantity } = req.body;
+
+  if (await bookExists(title, author)) {
+    await pool.query("UPDATE Books SET Quantity = Quantity + ? WHERE Title = ? AND author = ?",[parseInt(quantity), title, author]);
     return res.redirect("/admin/books/list");
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send("Error inserting user into database");
+  }
+
+  else {
+    try {
+      const sql = "INSERT INTO Books (Title, Author, Genre, Quantity) VALUES (?, ?, ?, ?)";
+      await pool.query(sql, [title, author, genre, quantity]);
+      console.log("Book added to database");
+      return res.redirect("/admin/books/list");
+    } catch (error) {
+      console.error(error);
+      return res.status(500).send("Error inserting user into database");
+    }
   }
 })
 
@@ -119,7 +131,10 @@ router.post("/admin/requests", isAdmin, async (req, res) => {
       for (const requestID of selectedRequests) {
 
         await pool.query('UPDATE BookRequests SET Status = "Accepted" WHERE RequestID =?', requestID);
-        await pool.query('UPDATE BookRequests SET AcceptDate = NOW() WHERE RequestID = ?',[requestID])
+        await pool.query('UPDATE BookRequests SET AcceptDate = NOW() WHERE RequestID = ?', [requestID])
+        const [bookIDS] = await pool.query("SELECT BookID FROM BookRequests WHERE RequestID = ?", [requestID])
+        const BookID = bookIDS[0].BookID;
+        await pool.query("UPDATE Books  SET Quantity = Quantity - 1 WHERE BookID=?", [BookID])
 
       }
       res.redirect('/admin/requests');
@@ -131,7 +146,10 @@ router.post("/admin/requests", isAdmin, async (req, res) => {
   else {
     try {
       await pool.query('UPDATE BookRequests SET Status = "Accepted" WHERE RequestID =?', [selectedRequests]);
-      await pool.query('UPDATE BookRequests SET AcceptDate = NOW() WHERE RequestID = ?',[selectedRequests])
+      await pool.query('UPDATE BookRequests SET AcceptDate = NOW() WHERE RequestID = ?', [selectedRequests]);
+      const [bookIDS] = await pool.query("SELECT BookID FROM BookRequests WHERE RequestID = ?", [selectedRequests])
+      const BookID = bookIDS[0].BookID;
+      await pool.query("UPDATE Books  SET Quantity = Quantity + 1 WHERE BookID=?", [BookID])
       res.redirect('/admin/requests');
     } catch (error) {
       console.error(error);

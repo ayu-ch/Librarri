@@ -17,29 +17,41 @@
         }
     </style>
 </head>
-    <body class="bg-[#a8dadc]">
-        <main
-            class="min-h-screen flex flex-col items-center justify-center bg-[#a8dadc] space-y-10 py-12 px-4 sm:px-6 lg:px-8">
-            <div class="max-w-md w-full mx-auto bg-[#f1faee] shadow rounded-lg p-7 space-y-6">
-                <h1 class="mt-6 text-center text-4xl font-extrabold text-[#e63946]">Add Book</h1>
-                <form method="post">
-                    <label class="text-sm font-bold text-[#1d3557] mb-1" for="title">Title:</label>
-                    <input class="border rounded-md bg-white px-3 py-2 mb-6" type="title" id="title" name="title"
-                        required>
 
-                    <label class="text-sm font-bold text-[#1d3557] mb-1" for="author">Author:</label>
-                    <input class="border rounded-md bg-white px-3 py-2 mb-6" type="author" id="author" name="author"
-                        required>
+<body class="bg-[#a8dadc]">
+    <main class="min-h-screen flex flex-col items-center justify-center bg-[#a8dadc] space-y-10 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full mx-auto bg-[#f1faee] shadow rounded-lg p-7 space-y-6">
+            <h1 class="mt-6 text-center text-4xl font-extrabold text-[#e63946]">Add Book</h1>
+            <form id="bookForm" method="post">
+                <label class="text-sm font-bold text-[#1d3557] mb-1" for="title">Title:</label>
+                <input class="border rounded-md bg-white px-3 py-2 mb-6" type="title" id="title" name="title" required>
 
-                    <label class="text-sm font-bold text-[#1d3557] mb-1" for="genre">Genre:</label>
-                    <input class="border rounded-md bg-white px-3 py-2 mb-6" type="genre" id="genre" name="genre"
-                        required>
+                <label class="text-sm font-bold text-[#1d3557] mb-1" for="author">Author:</label>
+                <input class="border rounded-md bg-white px-3 py-2 mb-6" type="author" id="author" name="author" required>
 
-                    <button class="w-full bg-[#1d3557] text-white rounded-md p-2" type="submit">Add Book</button>
-                </form>
+                <label class="text-sm font-bold text-[#1d3557] mb-1" for="genre">Genre:</label>
+                <input class="border rounded-md bg-white px-3 py-2 mb-6" type="genre" id="genre" name="genre" required>
+                
+                <label class="text-sm font-bold text-[#1d3557] mb-1" for="quantity">Quantity:</label>
+                <input class="border rounded-md bg-white px-3 py-2 mb-6" type="number" id="quantity" name="quantity" step="1" required>    
 
-            </div>
-        </main>
-    </body>
+                <button class="w-full bg-[#1d3557] text-white rounded-md p-2" type="submit">Add Book</button>
+            </form>
+
+        </div>
+    </main>
+
+    <script>
+        document.getElementById("bookForm").addEventListener("submit", function (event) {
+            var quantityInput = document.getElementById("quantity");
+            if (parseInt(quantityInput.value) <= 0) {
+                alert("Please enter a positive integer for quantity.");
+                event.preventDefault(); 
+            }
+        });
+
+       
+    </script>
+</body>
 
 </html>

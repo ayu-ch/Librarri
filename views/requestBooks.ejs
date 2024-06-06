@@ -35,4 +35,14 @@
     </div>
     </form>
 </body>
+<script>
+  fetch(link, {
+  method: 'POST'
+})
+.then(response => {
+  if (response.status==400){
+    alert("You already have or requested this book. ")
+  }
+})
+</script>
 </html>

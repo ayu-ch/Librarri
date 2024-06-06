@@ -14,7 +14,8 @@ CREATE TABLE Books (
     BookID INT AUTO_INCREMENT PRIMARY KEY,
     Title VARCHAR(255) NOT NULL,
     Author VARCHAR(255),
-    Genre VARCHAR(255)
+    Genre VARCHAR(255),
+    Quantity INT 
 );
 
 CREATE TABLE BookRequests (
