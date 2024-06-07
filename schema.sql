@@ -3,11 +3,11 @@ USE Library;
 
 CREATE TABLE User (
     UserID INT PRIMARY KEY AUTO_INCREMENT,
-    Username VARCHAR(255) NOT NULL,
+    Username VARCHAR(255) NOT NULL UNIQUE,
     Pass VARCHAR(255) NOT NULL,
     Role VARCHAR(255) NOT NULL,
     Created TIMESTAMP NOT NULL DEFAULT NOW(),
-    AdminRequest ENUM('NoRequest', 'Pending', 'Approved') DEFAULT 'NoRequest'
+    AdminRequest ENUM('NoRequest', 'Pending', 'Approved','Denied') DEFAULT 'NoRequest'
 );
 
 CREATE TABLE Books (
@@ -24,7 +24,7 @@ CREATE TABLE BookRequests (
     BookID INT,
     RequestDate TIMESTAMP NOT NULL DEFAULT NOW(),
     AcceptDate TIMESTAMP DEFAULT NULL,
-    Status ENUM('Pending','Accepted','Returned') DEFAULT 'Pending',
+    Status ENUM('Pending','Accepted','Returned','Denied') DEFAULT 'Pending',
     FOREIGN KEY (UserID) REFERENCES User(UserID),
     FOREIGN KEY (BookID) REFERENCES Books(BookID)
 );

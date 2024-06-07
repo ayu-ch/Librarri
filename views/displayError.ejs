@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Portal - Manage Books</title>
+    <title>Admin Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,28 +17,17 @@
       }
     </style>
   </head>
+
   <body class="bg-[#a8dadc]">
     <div class="bg-[#f1faee] max-w-7xl p-6 mx-auto rounded-lg my-12">
-      <h1 class="text-5xl text-center font-extrabold text-[#e63946] my-10">
-        Manage Books
+      <h1 class="text-4xl text-center font-extrabold text-[#e63946] mb-12">
+        <%=error%>
       </h1>
-      <div class="w-full border-b border-zinc-400 mb-6"></div>
-      <ul class="text-center py-10">
-        <li class="mb-12 text-4xl font-extrabold text-[#457B9D]">
-          <a href="/admin/books/add">Add Book</a>
-        </li>
-        <li class="my-12 text-4xl font-extrabold text-[#457B9D]">
-          <a href="/admin/books/remove">Remove Book</a>
-        </li>
-        <li class="my-12 text-4xl font-extrabold text-[#457B9D]">
-          <a href="/admin/books/list">List Books</a>
-        </li>
-      </ul>
     </div>
     <h1
       class="absolute top-0 left-0 pl-4 mt-4 mr-4 text-4xl font-bold text-[#1d3557]"
     >
-      <a href="/admin">Librarri</a>
+      <a href="/home">Librarri</a>
     </h1>
   </body>
 </html>
