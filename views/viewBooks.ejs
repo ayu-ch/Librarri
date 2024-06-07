@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Librarri</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <style>
+      *{
+        font-family: 'Poppins', sans-serif;
+      }
+    </style>
+    <style>
+      .pending {
+          color: red;
+      }
+      .accepted {
+          color: green;
+      }
+  </style>
+</head>
+<body class="bg-[#a8dadc]">
+  <div class="bg-[#f1faee] max-w-7xl p-6 mx-auto rounded-lg my-12">
+    <h1 class="text-5xl text-center font-extrabold text-[#e63946] mb-12">Your Books</h1>
+    <ul class="text-center">
+        <% books.forEach(function(book) { %>
+            <li class="mb-9">
+              <strong class="text-xl text-[#1d3557] font-extrabold ">Title:</strong><span class="text-xl text-[#457B9D] font-bold"> <%= book.Title %></span><br>
+              <strong class="text-xl text-[#1d3557] font-extrabold ">Author:</strong><span class="text-xl text-[#457B9D] font-bold"> <%= book.Author %></span><br>
+              <strong class="text-xl text-[#1d3557] font-extrabold ">Genre:</strong><span class="text-xl text-[#457B9D] font-bold"> <%= book.Genre %></span><br> 
+              
+              <span class="<%=book.Status === 'Pending' ? 'pending' : 'accepted' %>">
+                <strong> Status: </strong><%=book.Status%>
+              </span></li>
+        <% }); %>
+    </ul>
+</body>
+</html>

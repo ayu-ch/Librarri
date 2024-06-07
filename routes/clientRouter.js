@@ -207,7 +207,7 @@ router.get("/home/requests", async (req, res) => {
   const UserID = user[0].UserID;
   async function getRequests() {
     try {
-      const [rows, fields] = await pool.query('SELECT * FROM BookRequests WHERE UserID = ?', [UserID]);
+      const [rows, fields] = await pool.query('SELECT * FROM BookRequests WHERE UserID = ? AND Status ="Pending"', [UserID]);
       return rows;
     } catch (error) {
       throw error;
@@ -240,43 +240,43 @@ router.get("/home/requests", async (req, res) => {
 })
 
 
-// router.get("/home/books", async (req, res) => {
-//   token = req.cookies.uid;
-//   const decoded = jwt.verify(token, secret);
-//   const name = decoded.username;
-//   const [user] = await pool.query('SELECT UserID FROM User WHERE Username = ?', [name]);
-//   const UserID = user[0].UserID;
-//   async function getRequests() {
-//     try {
-//       const [rows, fields] = await pool.query('SELECT * FROM BookRequests WHERE UserID = ? AND Status = "Accepted"', [UserID]);
-//       return rows;
-//     } catch (error) {
-//       throw error;
-//     }
-//   }
-//   try {
-//     const requests = await getRequests();
-//     if (requests.length > 0) {
-//       const BookIDs = requests.map(request => request.BookID);
-//       console.log(BookIDs);
-//       token = req.cookies.uid;
-//       const decoded = jwt.verify(token, secret);
-//       const name = decoded.username;
-//       const [user] = await pool.query('SELECT UserID FROM User WHERE Username = ?', [name]);
-//       const UserID = user[0].UserID;
-//       const [books, fields] = await pool.query(`
-//           SELECT b.*, br.Status
-//           FROM Books b
-//           JOIN BookRequests br ON b.BookID = br.BookID
-//           WHERE b.BookID IN (?)
-//           AND br.UserID = ?
-//       `, [BookIDs, UserID]);
-//       res.render('viewRequests', { books: books });
-//     }
-//   } catch (error) {
-//     console.error(error);
-//   }
-// })
+router.get("/home/books", async (req, res) => {
+  token = req.cookies.uid;
+  const decoded = jwt.verify(token, secret);
+  const name = decoded.username;
+  const [user] = await pool.query('SELECT UserID FROM User WHERE Username = ?', [name]);
+  const UserID = user[0].UserID;
+  async function getRequests() {
+    try {
+      const [rows, fields] = await pool.query('SELECT * FROM BookRequests WHERE UserID = ? AND Status = "Accepted"', [UserID]);
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
+  try {
+    const requests = await getRequests();
+    if (requests.length > 0) {
+      const BookIDs = requests.map(request => request.BookID);
+      console.log(BookIDs);
+      token = req.cookies.uid;
+      const decoded = jwt.verify(token, secret);
+      const name = decoded.username;
+      const [user] = await pool.query('SELECT UserID FROM User WHERE Username = ?', [name]);
+      const UserID = user[0].UserID;
+      const [books, fields] = await pool.query(`
+          SELECT b.*, br.Status
+          FROM Books b
+          JOIN BookRequests br ON b.BookID = br.BookID
+          WHERE b.BookID IN (?)
+          AND br.UserID = ?
+      `, [BookIDs, UserID]);
+      res.render('viewBooks', { books: books });
+    }
+  } catch (error) {
+    console.error(error);
+  }
+})
 
 router.get("/home/return", async (req, res) => {
   async function getRequests() {
