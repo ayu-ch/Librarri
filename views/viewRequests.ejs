@@ -14,12 +14,10 @@
       }
     </style>
     <style>
-      .pending {
+      .request {
           color: red;
       }
-      .accepted {
-          color: green;
-      }
+     
   </style>
 </head>
 <body class="bg-[#a8dadc]">
@@ -32,7 +30,7 @@
               <strong class="text-xl text-[#1d3557] font-extrabold ">Author:</strong><span class="text-xl text-[#457B9D] font-bold"> <%= book.Author %></span><br>
               <strong class="text-xl text-[#1d3557] font-extrabold ">Genre:</strong><span class="text-xl text-[#457B9D] font-bold"> <%= book.Genre %></span><br> 
               
-              <span class="<%=book.Status === 'Pending' ? 'pending' : 'accepted' %>">
+              <span class="request">
                 <strong> Status: </strong><%=book.Status%>
               </span></li>
         <% }); %>

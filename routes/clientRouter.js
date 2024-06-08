@@ -210,7 +210,7 @@ router.get("/home/requests", async (req, res) => {
   async function getRequests() {
     try {
       const [rows, fields] = await pool.query(
-        'SELECT * FROM BookRequests WHERE UserID = ? AND Status ="Pending"',
+        "SELECT * FROM BookRequests WHERE UserID = ? AND Status IN ('Pending', 'Denied')",
         [UserID]
       );
       return rows;

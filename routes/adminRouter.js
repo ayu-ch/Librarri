@@ -142,7 +142,50 @@ router.get("/admin/books/update", isAdmin, async (req, res) => {
   }
 });
 
-router.post("/admin/books/update", async (req, res) => {
+router.post("/admin/requests/accept", isAdmin, async (req, res) => {
+  const requestID = req.body.requestID;
+  try {
+    await pool.query(
+      "UPDATE BookRequests SET Status='Accepted' WHERE RequestID=?",
+      [requestID]
+    );
+    await pool.query(
+      "UPDATE BookRequests SET AcceptDate = NOW() WHERE RequestID = ?",
+      [requestID]
+    );
+    const [bookIDS] = await pool.query(
+      "SELECT BookID FROM BookRequests WHERE RequestID = ?",
+      [requestID]
+    );
+    const BookID = bookIDS[0].BookID;
+    await pool.query(
+      "UPDATE Books  SET Quantity = Quantity - 1 WHERE BookID=?",
+      [BookID]
+    );
+    res.redirect("/admin/requests");
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error fetching books from database.");
+  }
+});
+
+router.post("/admin/requests/deny", isAdmin, async (req, res) => {
+  const requestID = req.body.requestID;
+  console.log(requestID);
+  try {
+    await pool.query(
+      "UPDATE BookRequests SET Status='Denied' WHERE RequestID=?",
+      [requestID]
+    );
+
+    res.redirect("/admin/requests");
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error fetching books from database.");
+  }
+});
+
+router.post("/admin/books/update", isAdmin, async (req, res) => {
   const selectedBooks = req.body.selectedBooks;
   console.log(selectedBooks);
 
@@ -180,60 +223,60 @@ router.get("/admin/requests", isAdmin, async (req, res) => {
   }
 });
 
-router.post("/admin/requests", isAdmin, async (req, res) => {
-  const selectedRequests = req.body.selectedRequests;
-  if (Array.isArray(selectedRequests)) {
-    try {
-      for (const requestID of selectedRequests) {
-        await pool.query(
-          'UPDATE BookRequests SET Status = "Accepted" WHERE RequestID =?',
-          requestID
-        );
-        await pool.query(
-          "UPDATE BookRequests SET AcceptDate = NOW() WHERE RequestID = ?",
-          [requestID]
-        );
-        const [bookIDS] = await pool.query(
-          "SELECT BookID FROM BookRequests WHERE RequestID = ?",
-          [requestID]
-        );
-        const BookID = bookIDS[0].BookID;
-        await pool.query(
-          "UPDATE Books  SET Quantity = Quantity - 1 WHERE BookID=?",
-          [BookID]
-        );
-      }
-      res.redirect("/admin/requests");
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Error accepting requests");
-    }
-  } else {
-    try {
-      await pool.query(
-        'UPDATE BookRequests SET Status = "Accepted" WHERE RequestID =?',
-        [selectedRequests]
-      );
-      await pool.query(
-        "UPDATE BookRequests SET AcceptDate = NOW() WHERE RequestID = ?",
-        [selectedRequests]
-      );
-      const [bookIDS] = await pool.query(
-        "SELECT BookID FROM BookRequests WHERE RequestID = ?",
-        [selectedRequests]
-      );
-      const BookID = bookIDS[0].BookID;
-      await pool.query(
-        "UPDATE Books  SET Quantity = Quantity - 1 WHERE BookID=?",
-        [BookID]
-      );
-      res.redirect("/admin/requests");
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Error accepting requests");
-    }
-  }
-});
+// router.post("/admin/requests", isAdmin, async (req, res) => {
+//   const selectedRequests = req.body.selectedRequests;
+//   if (Array.isArray(selectedRequests)) {
+//     try {
+//       for (const requestID of selectedRequests) {
+//         await pool.query(
+//           'UPDATE BookRequests SET Status = "Accepted" WHERE RequestID =?',
+//           requestID
+//         );
+//         await pool.query(
+//           "UPDATE BookRequests SET AcceptDate = NOW() WHERE RequestID = ?",
+//           [requestID]
+//         );
+//         const [bookIDS] = await pool.query(
+//           "SELECT BookID FROM BookRequests WHERE RequestID = ?",
+//           [requestID]
+//         );
+//         const BookID = bookIDS[0].BookID;
+//         await pool.query(
+//           "UPDATE Books  SET Quantity = Quantity - 1 WHERE BookID=?",
+//           [BookID]
+//         );
+//       }
+//       res.redirect("/admin/requests");
+//     } catch (error) {
+//       console.error(error);
+//       res.status(500).send("Error accepting requests");
+//     }
+//   } else {
+//     try {
+//       await pool.query(
+//         'UPDATE BookRequests SET Status = "Accepted" WHERE RequestID =?',
+//         [selectedRequests]
+//       );
+//       await pool.query(
+//         "UPDATE BookRequests SET AcceptDate = NOW() WHERE RequestID = ?",
+//         [selectedRequests]
+//       );
+//       const [bookIDS] = await pool.query(
+//         "SELECT BookID FROM BookRequests WHERE RequestID = ?",
+//         [selectedRequests]
+//       );
+//       const BookID = bookIDS[0].BookID;
+//       await pool.query(
+//         "UPDATE Books  SET Quantity = Quantity - 1 WHERE BookID=?",
+//         [BookID]
+//       );
+//       res.redirect("/admin/requests");
+//     } catch (error) {
+//       console.error(error);
+//       res.status(500).send("Error accepting requests");
+//     }
+//   }
+// });
 
 router.get("/admin/users", isAdmin, async (req, res) => {
   async function getUsers() {

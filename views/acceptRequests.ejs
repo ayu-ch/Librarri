@@ -1,61 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        font-family: "Poppins", sans-serif;
+      }
+    </style>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Portal</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-    rel="stylesheet">
-  <style>
-    * {
-      font-family: 'Poppins', sans-serif;
-    }
-  </style>
-</head>
-
-<body class="bg-[#a8dadc]">
-  <div class="bg-[#f1faee] max-w-7xl p-6 mx-auto rounded-lg my-12">
-    <h1 class="text-5xl text-center font-extrabold text-[#e63946] mb-12">Accept Requests</h1>
-    <form action="/admin/requests" method="POST">
+  <body class="bg-[#a8dadc]">
+    <div class="bg-[#f1faee] max-w-7xl p-6 mx-auto rounded-lg my-12">
+      <h1 class="text-5xl text-center font-extrabold text-[#e63946] mb-12">
+        Accept Requests
+      </h1>
       <ul class="text-center">
         <% requests.forEach(function(request) { %>
-          <li class="mb-9">
-            <strong class="text-xl text-[#1d3557] font-extrabold ">Book ID:</strong><span
-              class="text-xl text-[#457B9D] font-bold">
-              <%= request.BookID %>
-            </span><br>
-            <strong class="text-xl text-[#1d3557] font-extrabold ">Book Name:</strong><span
-              class="text-xl text-[#457B9D] font-bold">
-              <%= request.Title %>
-            </span><br>
-            <strong class="text-xl text-[#1d3557] font-extrabold ">User ID:</strong><span
-              class="text-xl text-[#457B9D] font-bold">
-              <%= request.UserID %>
-            </span><br>
-            <strong class="text-xl text-[#1d3557] font-extrabold ">User Name:</strong><span
-              class="text-xl text-[#457B9D] font-bold">
-              <%= request.Username %>
-            </span><br>
-            <strong class="text-xl text-[#1d3557] font-extrabold">Date:</strong>
-            <span class="text-xl text-[#457B9D] font-bold">
-              <% const requestDate=new Date(request.RequestDate); %>
-                <%= requestDate.toLocaleDateString('en-US') %>
-            </span>
-            <br>
-            <input type="checkbox" name="selectedRequests" value="<%= request.RequestID %>">
-            <% }); %>
+        <li class="mb-9">
+          <strong class="text-xl text-[#1d3557] font-extrabold">Book ID:</strong
+          ><span class="text-xl text-[#457B9D] font-bold">
+            <%= request.BookID %> </span
+          ><br />
+          <strong class="text-xl text-[#1d3557] font-extrabold"
+            >Book Name:</strong
+          ><span class="text-xl text-[#457B9D] font-bold">
+            <%= request.Title %> </span
+          ><br />
+          <strong class="text-xl text-[#1d3557] font-extrabold">User ID:</strong
+          ><span class="text-xl text-[#457B9D] font-bold">
+            <%= request.UserID %> </span
+          ><br />
+          <strong class="text-xl text-[#1d3557] font-extrabold"
+            >User Name:</strong
+          ><span class="text-xl text-[#457B9D] font-bold">
+            <%= request.Username %> </span
+          ><br />
+          <strong class="text-xl text-[#1d3557] font-extrabold">Date:</strong>
+          <span class="text-xl text-[#457B9D] font-bold">
+            <% const requestDate=new Date(request.RequestDate); %> <%=
+            requestDate.toLocaleDateString('en-US') %>
+          </span>
+          <br />
+          <form action="/admin/requests/accept" method="POST" class="inline">
+            <input
+              type="hidden"
+              name="requestID"
+              value="<%= request.RequestID %>"
+            />
+            <button
+              class="my-2 mx-2 bg-green-500 text-white rounded-md px-4 py-2 font-bold"
+              type="submit"
+            >
+              Accept
+            </button>
+          </form>
+          <form action="/admin/requests/deny" method="POST" class="inline">
+            <input
+              type="hidden"
+              name="requestID"
+              value="<%= request.RequestID %>"
+            />
+            <button
+              class="my-2 mx-2 bg-red-500 text-white rounded-md px-4 py-2 font-bold"
+              type="submit"
+            >
+              Deny
+            </button>
+          </form>
+        </li>
+        <% }); %>
       </ul>
-      <div class="max-w-sm mx-auto">
-        <button class="w-full bg-[#a8dadc] text-gray-700 rounded-md p-2 font-extrabold text-xl text-[#1D3557]"
-          type="submit">Accept Requests</button>
-      </div>
-    </form>
-    <h1 class="absolute top-0 left-0 pl-4 mt-4 mr-4 text-4xl font-bold text-[#1d3557]"><a  href="/admin">Librarri</a></h1>
-</body>
-
+      <h1
+        class="absolute top-0 left-0 pl-4 mt-4 mr-4 text-4xl font-bold text-[#1d3557]"
+      >
+        <a href="/admin">Librarri</a>
+      </h1>
+    </div>
+  </body>
 </html>
