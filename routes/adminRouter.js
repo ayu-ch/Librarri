@@ -84,7 +84,18 @@ router.post("/admin/books/remove", async (req, res) => {
   if (Array.isArray(selectedBooks)) {
     try {
       for (const BookID of selectedBooks) {
-        await pool.query("DELETE FROM Books WHERE BookID = ?", [BookID]);
+        const checkRequest = await pool.query(
+          "SELECT * FROM BookRequests WHERE BookID = ? AND Status = 'Accepted'",
+          [BookID]
+        );
+
+        if (checkRequest.length != 0) {
+          return res.render("displayError", {
+            error: "A book is already accepted",
+          });
+        } else {
+          await pool.query("DELETE FROM Books WHERE BookID = ?", [BookID]);
+        }
       }
       res.redirect("/admin/books/remove");
     } catch (error) {
@@ -93,12 +104,59 @@ router.post("/admin/books/remove", async (req, res) => {
     }
   } else {
     try {
-      await pool.query("DELETE FROM Books WHERE BookID = ?", [selectedBooks]);
+      const checkRequest = await pool.query(
+        "SELECT * FROM BookRequests WHERE BookID = ? AND Status = 'Accepted'",
+        [selectedBooks]
+      );
+      console.log(checkRequest);
+      if (checkRequest.length != 0) {
+        return res.render("displayError", {
+          error: "A book is already accepted",
+        });
+      } else {
+        await pool.query("DELETE FROM Books WHERE BookID = ?", [selectedBooks]);
+      }
       res.redirect("/admin/books/remove");
     } catch (error) {
       console.error(error);
       res.status(500).send("Error accepting requests");
     }
+  }
+});
+
+router.get("/admin/books/update", isAdmin, async (req, res) => {
+  async function getBooks() {
+    try {
+      const [rows, fields] = await pool.query("SELECT * FROM Books");
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
+  try {
+    const books = await getBooks();
+    res.render("updateBook", { books: books });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error fetching books from database.");
+  }
+});
+
+router.post("/admin/books/update", async (req, res) => {
+  const selectedBooks = req.body.selectedBooks;
+  console.log(selectedBooks);
+
+  try {
+    for (let i = 0; i < selectedBooks.length; i += 2) {
+      await pool.query("UPDATE Books SET Quantity =?  WHERE BookID = ?", [
+        selectedBooks[i],
+        selectedBooks[i + 1],
+      ]);
+    }
+    res.redirect("/admin/books/list");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error accepting requests");
   }
 });
 

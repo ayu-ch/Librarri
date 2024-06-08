@@ -393,7 +393,7 @@ router.post("/home/requestAdmin", async (req, res) => {
       "UPDATE User SET AdminRequest = 'Pending' WHERE UserID =?",
       [UserID]
     );
-    res.send("Request Sent!");
+    return res.render("displayError", { error: "Request Sent!" });
   } catch (error) {
     console.log(error);
     throw error;
